@@ -38,6 +38,9 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// БД для тестов
+	testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.test { useJUnitPlatform() }

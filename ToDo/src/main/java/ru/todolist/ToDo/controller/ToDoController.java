@@ -6,77 +6,57 @@ import org.springframework.web.bind.annotation.*;
 import ru.todolist.ToDo.dto.TaskRequest;
 import ru.todolist.ToDo.dto.TaskResponse;
 import ru.todolist.ToDo.dto.TaskUpdateRequest;
-import ru.todolist.ToDo.mapper.TaskMapper;
 import ru.todolist.ToDo.model.StatusOfTask;
-import ru.todolist.ToDo.model.Task;
-import ru.todolist.ToDo.service.impl.ToDoServiceImpl;
+import ru.todolist.ToDo.service.ToDoService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/todo")
+@RequestMapping("/api/v1/todo/tasks")
 @AllArgsConstructor
 public class ToDoController {
 
-    private final ToDoServiceImpl service;
-    private final TaskMapper mapper;
+    private final ToDoService service;
 
     @GetMapping
     public List<TaskResponse> findAllTasks() {
-        return service.findAllTasks().stream()
-                .map(mapper::toDto).toList();
+        return service.findAllTasks();
     }
 
-    @PostMapping("/create_task")
+    @PostMapping
     public TaskResponse createTask(@RequestBody TaskRequest task) {
-        Task saved = service.createTask(mapper.toEntity(task));
-        return mapper.toDto(saved);
+        return service.createTask(task);
     }
 
-    @PostMapping("/create_tasks")
+    @PostMapping("/bulk")
     public List<TaskResponse> createTasks(@RequestBody List<TaskRequest> tasks) {
-        var entities = tasks.stream()
-                .map(mapper::toEntity)
-                .toList();
-        var saved = service.createTasks(entities);
-        return saved.stream()
-                .map(mapper::toDto)
-                .toList();
+                return service.createTasks(tasks);
     }
 
-    @PutMapping("/edit_task")
+    @PutMapping
     public TaskResponse editTask(@RequestBody TaskUpdateRequest task) {
-        Task existing = service.getById(task.getId());
-        mapper.updateEntity(task, existing);
-        Task saved = service.editTask(existing);
-        return mapper.toDto(saved);
+        return service.editTask(task);
     }
 
-    @DeleteMapping("/delete_task/{id}")
+    @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Integer id) {
         service.deleteTask(id);
     }
 
     // Фильтр задач по статусу
-    @GetMapping("/filter_by_status/{status}")
+    @GetMapping("/status/{status}")
     public List<TaskResponse> filterOfTasks(@PathVariable StatusOfTask status) {
-        return service.filterOfTasks(status).stream()
-                .map(mapper::toDto)
-                .toList();
+        return service.filterOfTasks(status);
     }
 
-    @GetMapping("/sort_by_deadline")
+    @GetMapping("/sort/deadline")
     public List<TaskResponse> sortTasksByDateOfDedLine() {
-        return service.sortTasksByDateOfDedLine().stream()
-                .map(mapper::toDto)
-                .toList();
+        return service.sortTasksByDateOfDedLine();
     }
 
-    @GetMapping("/sort_by_status")
+    @GetMapping("/sort/status")
     public List<TaskResponse> sortTasksByStatus() {
-        return service.sortTasksByStatus().stream()
-                .map(mapper::toDto)
-                .toList();
+        return service.sortTasksByStatus();
     }
 
 }
